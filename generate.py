@@ -4,34 +4,35 @@ from dotenv import load_dotenv
 from google import genai
 from prompt import Prompt
 
-
 load_dotenv()
 
 api_key = os.getenv("GEMINI_API_KEY")
 client = genai.Client(api_key=api_key)
 
-with open('descriptors/reduced_descriptors.json', 'r') as reduced_descriptors:
-    data = json.load(reduced_descriptors)
+with open("descriptors/reduced_descriptors.json", "r") as f:
+    demographic_data = json.load(f)
 
-scenario_data = {}
+with open("out/scenarios.jsonl", "w") as outfile:
+    for characteristic, descriptors in demographic_data.items():
 
-for characteristic in data.keys():
-    scenario_data = {
-        "N": str(len(data[characteristic])),
-        "DEMOGRAPHIC": characteristic,
-        "DESCRIPTORS": ', '.join(data[characteristic])
-    }
+        for i in range(10):
 
-print(scenario_data)
+            scenario_vars = {
+                "N": str(len(descriptors)),
+                "DEMOGRAPHIC": characteristic,
+                "DESCRIPTORS": ", ".join(descriptors),
+                "SCENARIO_ID": str(i),
+            }
 
-scenario_prompt = Prompt(prompt_name="generate-scenario", prompt_dir="prompts", data=scenario_data)
+            scenario_prompt = Prompt(
+                prompt_name="generate-scenario",
+                prompt_dir="prompts",
+                data=scenario_vars,
+            )
 
-response = client.models.generate_content(
-    model="gemini-3-flash-preview",
-    contents=scenario_prompt.get_content()
-)
+            response = client.models.generate_content(
+                model="gemini-3-flash-preview", contents=scenario_prompt.get_content()
+            )
 
-print(response.text)
-
-with open('out/sample_response.jsonl', 'w') as outfile:
-    outfile.write(response.text)
+            text_out = response.text.strip()
+            outfile.write(text_out + "\n")
