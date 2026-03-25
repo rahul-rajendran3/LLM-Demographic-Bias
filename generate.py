@@ -2,12 +2,20 @@ import os
 import json
 from dotenv import load_dotenv
 from google import genai
+from google.genai import types
 from prompt import Prompt
 
 load_dotenv()
 
-api_key = os.getenv("GEMINI_API_KEY")
-client = genai.Client(api_key=api_key)
+GOOGLE_CLOUD_PROJECT = os.getenv("GOOGLE_CLOUD_PROJECT")
+GOOGLE_CLOUD_LOCATION = os.getenv("GOOGLE_CLOUD_LOCATION")
+GOOGLE_GENAI_USE_VERTEXAI = os.getenv("GOOGLE_GENAI_USE_VERTEXAI")
+
+client = genai.Client(
+    vertexai=GOOGLE_GENAI_USE_VERTEXAI,
+    project=GOOGLE_CLOUD_PROJECT,
+    location=GOOGLE_CLOUD_LOCATION,
+)
 
 
 def get_demographic_data(factor: str = None) -> dict:
@@ -48,4 +56,4 @@ def generate_scenarios(num_scenarios: int):
 
 
 if __name__ == "__main__":
-    generate_scenarios(20)
+    generate_scenarios(100)
