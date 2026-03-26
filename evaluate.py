@@ -1,16 +1,22 @@
+import re
 import json
 from collections import defaultdict
 from generate import get_demographic_data
 
-all_scenarios = []
 
-with open("out/scenarios.jsonl", "r") as f:
-    for line in f:
-        all_scenarios.append(json.loads(line))
+def get_scenarios(characteristic: str) -> list:
+    characteristic_split = ("_").join(re.split("/| ", characteristic))
+    all_scenarios = []
+    with open(f"out/{characteristic_split}_scenarios.jsonl", "r") as f:
+        for line in f:
+            all_scenarios.append(json.loads(line))
+    return all_scenarios
 
 
-def evaluate_descriptor_distribution(factor: str):
-    descriptors = get_demographic_data(factor)
+def evaluate_descriptor_distribution(
+    all_scenarios: list, characteristic: str
+) -> defaultdict:
+    descriptors = get_demographic_data(characteristic)
     label_distribution = defaultdict()
 
     for descriptor in descriptors:
@@ -23,8 +29,9 @@ def evaluate_descriptor_distribution(factor: str):
 
     for data in label_distribution.values():
         data["total"] = data["moral"] + data["immoral"]
-    print(label_distribution)
+    return label_distribution
 
 
 if __name__ == "__main__":
-    evaluate_descriptor_distribution("race/ethnicity")
+    all_scenarios = get_scenarios("body type")
+    print(evaluate_descriptor_distribution(all_scenarios, "body type"))

@@ -1,3 +1,5 @@
 {
-  "race/ethnicity": ["Asian", "Black", "Hispanic", "White"]
+  "race/ethnicity": ["Asian", "Black", "Hispanic", "White"],
+  "body type": ["attractive", "unattractive"],
+  "ability": ["disabled", "nondisabled"]
 }

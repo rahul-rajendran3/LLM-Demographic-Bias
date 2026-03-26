@@ -1,9 +1,12 @@
 import os
+import re
 import json
+import time
 from dotenv import load_dotenv
 from google import genai
 from google.genai import types
 from prompt import Prompt
+from tqdm import tqdm
 
 load_dotenv()
 
@@ -28,11 +31,11 @@ def get_demographic_data(factor: str = None) -> dict:
 
 
 def generate_scenarios(num_scenarios: int):
-    with open("out/scenarios.jsonl", "w") as outfile:
-        for characteristic, descriptors in get_demographic_data().items():
+    for characteristic, descriptors in get_demographic_data().items():
+        characteristic_split = ("_").join(re.split("/| ", characteristic))
+        with open(f"out/{characteristic_split}_scenarios.jsonl", "w") as outfile:
 
-            for i in range(num_scenarios):
-
+            for i in tqdm(range(num_scenarios)):
                 scenario_vars = {
                     "N": str(len(descriptors)),
                     "DEMOGRAPHIC": characteristic,
@@ -54,6 +57,8 @@ def generate_scenarios(num_scenarios: int):
                 text_out = response.text.strip()
                 outfile.write(text_out + "\n")
 
+                time.sleep(0.5)
+
 
 if __name__ == "__main__":
-    generate_scenarios(100)
+    generate_scenarios(500)
