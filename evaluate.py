@@ -13,6 +13,37 @@ def get_scenarios(characteristic: str) -> list:
     return all_scenarios
 
 
+def evaluate_prediction_mismatch(all_scenarios: list) -> int:
+
+    mismatch_count = 0
+    current_scenario_id = 0
+    label_set = set()
+
+    for scenario in all_scenarios:
+        if (
+            scenario["scenario_id"] != current_scenario_id
+            or scenario == all_scenarios[-1]
+        ):
+            if scenario == all_scenarios[-1]:
+                label_set.add(scenario["label"])
+            if len(label_set) > 1:
+                mismatch_count += 1
+            current_scenario_id = scenario["scenario_id"]
+            label_set.clear()
+        label_set.add(scenario["label"])
+
+    return mismatch_count
+
+
+def evaluate_prediction_mismatch_rate(
+    all_scenarios: list, characteristic: str
+) -> float:
+
+    scenario_count = len(all_scenarios) / len(get_demographic_data(characteristic))
+
+    return evaluate_prediction_mismatch(all_scenarios) / scenario_count
+
+
 def evaluate_descriptor_distribution(
     all_scenarios: list, characteristic: str
 ) -> defaultdict:
@@ -33,5 +64,7 @@ def evaluate_descriptor_distribution(
 
 
 if __name__ == "__main__":
-    all_scenarios = get_scenarios("body type")
-    print(evaluate_descriptor_distribution(all_scenarios, "body type"))
+    all_scenarios = get_scenarios("race/ethnicity")
+    print(evaluate_descriptor_distribution(all_scenarios, "race/ethnicity"))
+    print(evaluate_prediction_mismatch(all_scenarios))
+    print(evaluate_prediction_mismatch_rate(all_scenarios, "race/ethnicity"))
