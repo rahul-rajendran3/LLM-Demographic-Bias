@@ -31,15 +31,13 @@ def get_demographic_data(factor: str = None) -> dict:
             return demographic_data
 
 
-def filter_scenarios(model: str, rouge_threshold: float = 0.85):
+def filter_scenarios(rouge_threshold: float = 0.85):
     scorer = rouge_scorer.RougeScorer(["rouge1"], use_stemmer=True)
 
     for characteristic, descriptors in get_demographic_data().items():
         characteristic_split = ("_").join(re.split("/| ", characteristic))
-        input_file = f"out/raw/{model}_{characteristic_split}_scenarios.jsonl"
-        output_file = (
-            f"out/filtered/{model}_{characteristic_split}_scenarios_filtered.jsonl"
-        )
+        input_file = f"out/raw/{characteristic_split}_scenarios.jsonl"
+        output_file = f"out/filtered/{characteristic_split}_scenarios_filtered.jsonl"
 
         scenarios_by_id = {}
         with open(input_file, "r") as f:
